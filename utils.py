@@ -32,7 +32,7 @@ def parse_resume_with_gemini(raw_text: str, api_key: str) -> ResumeSchema:
     client = genai.Client(api_key=api_key)
 
     # Primary model is gemini-3.8-flash, with reliable fallbacks if throttled
-    models_to_try = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-1.5-flash']
+    models_to_try = ['gemini-3.8-flash', 'gemini-1.5-flash']
     
     last_exception = None
     
