@@ -4,3 +4,4 @@ pdfplumber
 python-docx
 instructor
 google-genai
+groq

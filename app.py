@@ -1,19 +1,16 @@
 import streamlit as st
-from utils import extract_text_from_file, parse_resume_with_gemini
+from utils import extract_text_from_file, parse_resume
 
 st.set_page_config(page_title="Resume Auto-Fill App", layout="wide")
 
 try:
-    api_key = st.secrets["GEMINI_API_KEY"]
+    api_key = st.secrets["GROQ_API_KEY"]
 except Exception:
-    st.error("GEMINI_API_KEY is missing! Please configure it in your Streamlit secrets.")
+    st.error("GROQ_API_KEY is missing! Please configure it in your Streamlit secrets.")
     st.stop()
 
 st.title("📄 AI Resume Parser & Auto-Fill Form")
 st.markdown("Upload a resume (`.pdf` or `.docx`) to automatically populate the application form below.")
-
-# Input for Google API Key (or you can load it from st.secrets)
-# api_key = st.sidebar.text_input("Gemini API Key", type="password", help="Get a free key from aistudio.google.com")
 
 # Initialize session state keys for form fields if they don't exist
 default_fields = {
@@ -37,15 +34,15 @@ uploaded_file = st.file_uploader("Choose a resume file", type=["pdf", "docx"])
 if uploaded_file is not None:
     if st.button("Extract & Auto-Fill", type="primary"):
         if not api_key:
-            st.warning("Please enter your Gemini API key in the sidebar first.")
+            st.warning("Please enter your Groq API key in the sidebar first.")
         else:
-            with st.spinner("Reading resume and extracting details with Gemini..."):
+            with st.spinner("Reading resume and extracting details ..."):
                 try:
                     # Extract raw text
                     raw_text = extract_text_from_file(uploaded_file)
                     
-                    # Parse using Gemini structured output
-                    extracted_data = parse_resume_with_gemini(raw_text, api_key)
+                    # Parse using Groq structured output
+                    extracted_data = parse_resume(raw_text, api_key)
                     
                     # Map extracted data to session state variables
                     st.session_state["full_name"] = extracted_data.full_name
@@ -68,16 +65,16 @@ with st.form("resume_form"):
     col1, col2 = st.columns(2)
     
     with col1:
-        full_name = st.text_input("Full Name", value=st.session_state["full_name"])
-        email = st.text_input("Email", value=st.session_state["email"])
-        phone = st.text_input("Phone", value=st.session_state["phone"])
+        full_name = st.text_input("Full Name", key="full_name")
+        email = st.text_input("Email", key="email")
+        phone = st.text_input("Phone", key="phone")
     
     with col2:
-        exp_title = st.text_input("Most Recent Job Title", value=st.session_state["exp_title"])
-        exp_company = st.text_input("Most Recent Company", value=st.session_state["exp_company"])
-        skills = st.text_input("Skills (comma-separated)", value=st.session_state["skills"])
+        exp_title = st.text_input("Most Recent Job Title", key="exp_title")
+        exp_company = st.text_input("Most Recent Company", key="exp_company")
+        skills = st.text_input("Skills (comma-separated)", key="skills")
 
-    summary = st.text_area("Professional Summary", value=st.session_state["summary"])
+    summary = st.text_area("Professional Summary", key="summary")
     
     submitted = st.form_submit_button("Submit Application")
     if submitted:
